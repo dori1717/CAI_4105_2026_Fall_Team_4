@@ -1,5 +1,8 @@
 # CAI 4105 - Fall 2026 - Team 4
 
+- **Final notebook:** [06_final_model.ipynb](notebooks/06_final_model.ipynb)
+- **Final predictions:** [predictions.csv](predictions.csv)
+
 ## Team Members
 - Dariya
 - Bakai
