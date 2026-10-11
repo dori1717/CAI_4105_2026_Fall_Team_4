@@ -27,6 +27,9 @@ Contains Jupyter notebooks for data preprocessing, model development, evaluation
 - model_comparison.csv: all models with the same metrics (written by `05_model_comparison.ipynb`)
 - decision_tree.csv, linear_regression_results.csv: per-model results from the model notebooks
 
+### requirements.txt
+Pinned Python packages needed to run the notebooks.
+
 ## Validation Strategy
 - Hold-out split: 80% training (5,918 rows), 20% validation (1,480 rows), `train_test_split(test_size=0.2, random_state=42)`.
 - 5-fold cross-validation (`KFold(shuffle=True, random_state=42)`) on the training part for Grid Search and model selection. CV RMSE (mean ± std over folds) is the primary selection metric.
@@ -60,7 +63,16 @@ Key findings:
 Current recommendation: **Random Forest (tuned)** (`n_estimators=400`, `max_depth=20`, `min_samples_leaf=1`, `max_features=0.33`, original features), with CV RMSE 412.5 ± 24.1 and validation RMSE 444.9. The selection will be revisited once the tuned Gradient Boosting is added: lowest CV RMSE wins, and when the difference is not significant the simpler and faster model is preferred.
 
 ## Reproducibility
-Notebooks are run from the `notebooks/` directory and read data from `../data/`. Results in this README were produced with Python 3.14, scikit-learn 1.9.0, pandas 3.0.3, numpy 2.4.6 and matplotlib 3.11.0. All random seeds are fixed (`random_state=42`).
+Requires Python 3.12 or newer (results in this README were produced with Python 3.14). Exact package versions are pinned in `requirements.txt`:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+jupyter lab
+```
+
+Notebooks are run from the `notebooks/` directory and read data from `../data/`. All random seeds are fixed (`random_state=42`).
 
 ## Workflow
 Each team member works on a separate Git branch. Changes are committed and pushed to the individual branch, then merged into the main branch through a pull request.
