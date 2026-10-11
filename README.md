@@ -9,6 +9,17 @@
 ## Project Overview
 This repository contains the work for our CAI 4105 Fall 2026 team project: predicting the monthly rental price of an apartment (`price`) from its characteristics and location. RMSE is the primary evaluation metric.
 
+**Final notebook:** `notebooks/06_final_model.ipynb` (complete workflow from loading the data to `predictions.csv`).
+**Predictions:** `predictions.csv` (`ID`, `price` for all 2,467 test listings).
+
+## Approach
+1. Data checks and shared preprocessing: one-hot encoding for `category`, `has_photo`, `state`; scaling of numeric features for Linear Regression only (`01`).
+2. One shared validation protocol for all models (below).
+3. The four required models, each tuned with Grid Search: Linear Regression (`01`), Decision Tree (`02`), Random Forest (`03`), Gradient Boosting (`04`). Gradient Boosting is also trained on a log-transformed target.
+4. Comparison of all models under one protocol with paired fold comparisons, bootstrap intervals, learning curves and error analysis (`05`).
+5. Improvement of the best models with neighborhood price features (price level of the nearest training listings, computed out-of-fold to avoid leakage), Grid Search for the new features, and averaging ensembles (`06`).
+6. Selection of the final model with a fixed rule, refit on all 7,398 labeled rows, predictions for the test set (`06`).
+
 ## Repository Structure
 
 ### data/
@@ -23,10 +34,14 @@ Contains Jupyter notebooks for data preprocessing, model development, evaluation
 - 03_random_forest.ipynb: Random Forest with Grid Search and feature engineering
 - 04_gradient_boosting.ipynb: Gradient Boosting with Grid Search and a log-transformed target
 - 05_model_comparison.ipynb: evaluation and comparison of all models under one protocol
+- 06_final_model.ipynb: final notebook: feature engineering, ensembles, final model selection and `predictions.csv`
 
 ### results/
 - model_comparison.csv: all models with the same metrics (written by `05_model_comparison.ipynb`)
 - decision_tree.csv, linear_regression_results.csv, gradient_boosting.csv: per-model results from the model notebooks
+
+### predictions.csv
+Final predictions for `challenge1_test.csv` (written by `06_final_model.ipynb`).
 
 ### requirements.txt
 Pinned Python packages needed to run the notebooks.
@@ -62,8 +77,33 @@ Key findings:
 - The CV error of the tree ensembles still decreases with more training data, so the final model should be refit on all labeled rows.
 - The 10% most expensive listings produce 58% of the squared error of the best model; predictions are pulled toward the mean at both ends of the price range.
 
+## Model Improvement (`06_final_model.ipynb`)
+Same split and CV folds as above. The tuned required models are the starting point; "nbr" marks models with the neighborhood price features.
+
+| Model | CV RMSE | Validation RMSE |
+|---|---|---|
+| Ensemble (GB, RF + nbr, GB + nbr) | 368.3 ± 17.4 | 398.8 |
+| **Ensemble (GB, GB + nbr): final model** | **368.8 ± 14.0** | **401.5** |
+| Gradient Boosting + nbr (tuned) | 383.1 ± 16.4 | 415.4 |
+| Gradient Boosting (tuned, log target) | 383.9 ± 14.1 | 405.9 |
+| Random Forest + nbr (tuned) | 388.3 ± 24.1 | 410.5 |
+| Random Forest (tuned) | 412.5 ± 24.1 | 444.9 |
+| Decision Tree (tuned) | 482.4 ± 16.5 | 503.7 |
+| Linear Regression | 520.9 ± 35.7 | 550.0 |
+
+- Neighborhood features lower the Random Forest CV RMSE by 24 and its validation RMSE by 34. Gradient Boosting already models location well, so on its own it does not improve with them.
+- Averaging Gradient Boosting with and without neighborhood features (the least correlated pair of models) lowers CV RMSE by 15 compared with the best single model, and the improvement is significant (paired t-test on the folds).
+
 ## Final Model
-Best of the required models: **Gradient Boosting, tuned, trained on log(price)** (`n_estimators=1000`, `learning_rate=0.1`, `max_depth=5`, `min_samples_leaf=5`, `subsample=0.8`, `max_features=0.5`), with CV RMSE 383.9 ± 14.1 and validation RMSE 405.9. It is the starting point for the final model selection, which adds location features and ensembles under the same rule: lowest CV RMSE wins, and when the difference is not significant the simpler and faster model is preferred.
+**Equal-weight average of two Gradient Boosting models trained on `log(price)`:**
+- Gradient Boosting on the original features (`n_estimators=1000`, `learning_rate=0.1`, `max_depth=5`, `min_samples_leaf=5`, `subsample=0.8`, `max_features=0.5`);
+- the same model with the neighborhood features (`k=5`) and `max_depth=3`, `learning_rate=0.05`.
+
+**Final validation performance:** CV RMSE 368.8 ± 14.0, validation RMSE 401.5 (MAE 233.1, R² 0.78).
+
+**Selection rule:** walk up in complexity (best single model, best two-model ensemble, three-model ensemble) and move to the more complex model only if it is significantly better on the 5 CV folds. The two-model ensemble is significantly better than the best single model (t = 4.93); the three-model ensemble is only 0.4 lower on CV and not significantly better (t = 0.20), so the simpler two-model ensemble was selected. Trade-offs: low interpretability (feature importances only) and longer training than a single model (a few seconds), both acceptable for an RMSE competition.
+
+For `predictions.csv` the final model is refit on all 7,398 labeled rows; the neighborhood features of the test listings are computed from those rows only.
 
 ## Reproducibility
 Requires Python 3.12 or newer (results in this README were produced with Python 3.14). Exact package versions are pinned in `requirements.txt`:
@@ -75,7 +115,7 @@ pip install -r requirements.txt
 jupyter lab
 ```
 
-Notebooks are run from the `notebooks/` directory and read data from `../data/`. All random seeds are fixed (`random_state=42`).
+Notebooks are run from the `notebooks/` directory and read data from `../data/`. All random seeds are fixed (`random_state=42`), so rerunning `06_final_model.ipynb` (about 4 minutes) reproduces `predictions.csv` exactly.
 
 ## Workflow
 Each team member works on a separate Git branch. Changes are committed and pushed to the individual branch, then merged into the main branch through a pull request.
