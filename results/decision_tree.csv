@@ -1,0 +1,2 @@
+model,best_params,train_rmse,cv_rmse,val_rmse
+Decision Tree,"{'ccp_alpha': 50.0, 'max_depth': 15, 'min_samples_leaf': 5, 'min_samples_split': 2}",346.44,482.37,503.72
