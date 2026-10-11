@@ -1,8 +1,10 @@
 Model,Family,Source notebook,Train RMSE,CV RMSE,CV std,Validation RMSE,Gap (Val - Train),Validation MAE,Validation R2,Fit time (s),Complexity
-Random Forest (tuned),Random Forest,03_random_forest,181.87,412.53,24.13,444.88,263.01,260.83,0.73,0.67,"400 trees, 943,409 leaves"
-Random Forest (tuned + FE),Random Forest,03_random_forest,173.77,417.12,26.63,450.81,277.05,265.41,0.72,0.98,"400 trees, 1,024,189 leaves"
+Gradient Boosting (tuned + log target),Gradient Boosting,04_gradient_boosting,201.76,383.91,14.12,405.94,204.18,240.01,0.77,2.58,"1000 trees, 19,710 leaves"
+Gradient Boosting (tuned),Gradient Boosting,04_gradient_boosting,183.05,396.07,13.12,410.29,227.24,242.81,0.77,2.78,"1000 trees, 18,567 leaves"
+Random Forest (tuned),Random Forest,03_random_forest,181.87,412.53,24.13,444.88,263.01,260.83,0.73,0.66,"400 trees, 943,409 leaves"
+Random Forest (tuned + FE),Random Forest,03_random_forest,173.77,417.12,26.63,450.81,277.05,265.41,0.72,0.95,"400 trees, 1,024,189 leaves"
 Random Forest (baseline),Random Forest,03_random_forest,159.94,424.36,22.36,456.52,296.58,265.48,0.71,0.44,"100 trees, 351,839 leaves"
-Gradient Boosting (default),Gradient Boosting,pending,405.21,462.8,29.64,486.73,81.53,304.7,0.67,0.32,"100 trees, 791 leaves"
+Gradient Boosting (baseline),Gradient Boosting,04_gradient_boosting,405.21,462.8,29.64,486.73,81.53,304.7,0.67,0.33,"100 trees, 791 leaves"
 Decision Tree (tuned),Decision Tree,02_decision_tree,346.44,482.37,16.53,503.72,157.27,306.36,0.65,0.02,"1 tree, 356 leaves"
 Linear Regression,Linear Regression,01_data_preprocessing,515.01,520.94,35.69,549.97,34.96,349.2,0.58,0.01,61 coefficients
 Decision Tree (baseline),Decision Tree,02_decision_tree,39.35,559.81,19.71,544.24,504.89,322.52,0.59,0.05,"1 tree, 5,443 leaves"

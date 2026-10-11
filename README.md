@@ -21,11 +21,12 @@ Contains Jupyter notebooks for data preprocessing, model development, evaluation
 - 01_data_preprocessing.ipynb: data checks, shared train/validation split, preprocessing, Linear Regression
 - 02_decision_tree.ipynb: Decision Tree with Grid Search
 - 03_random_forest.ipynb: Random Forest with Grid Search and feature engineering
+- 04_gradient_boosting.ipynb: Gradient Boosting with Grid Search and a log-transformed target
 - 05_model_comparison.ipynb: evaluation and comparison of all models under one protocol
 
 ### results/
 - model_comparison.csv: all models with the same metrics (written by `05_model_comparison.ipynb`)
-- decision_tree.csv, linear_regression_results.csv: per-model results from the model notebooks
+- decision_tree.csv, linear_regression_results.csv, gradient_boosting.csv: per-model results from the model notebooks
 
 ### requirements.txt
 Pinned Python packages needed to run the notebooks.
@@ -42,25 +43,27 @@ All models are retrained in `05_model_comparison.ipynb` with the hyperparameters
 
 | Model | Train RMSE | CV RMSE | Validation RMSE | Validation R² |
 |---|---|---|---|---|
+| Gradient Boosting (tuned + log target) | 201.8 | 383.9 ± 14.1 | 405.9 | 0.77 |
+| Gradient Boosting (tuned) | 183.1 | 396.1 ± 13.1 | 410.3 | 0.77 |
 | Random Forest (tuned) | 181.9 | 412.5 ± 24.1 | 444.9 | 0.73 |
 | Random Forest (tuned + FE) | 173.8 | 417.1 ± 26.6 | 450.8 | 0.72 |
 | Random Forest (baseline) | 159.9 | 424.4 ± 22.4 | 456.5 | 0.71 |
-| Gradient Boosting (default) | 405.2 | 462.8 ± 29.6 | 486.7 | 0.67 |
+| Gradient Boosting (baseline) | 405.2 | 462.8 ± 29.6 | 486.7 | 0.67 |
 | Decision Tree (tuned) | 346.4 | 482.4 ± 16.5 | 503.7 | 0.65 |
 | Linear Regression | 515.0 | 520.9 ± 35.7 | 550.0 | 0.58 |
 | Decision Tree (baseline) | 39.4 | 559.8 ± 19.7 | 544.2 | 0.59 |
 | Mean baseline | 814.0 | 813.3 ± 40.8 | 850.9 | 0.00 |
 
 Key findings:
-- Random Forest (tuned) has the lowest CV and validation RMSE. It beats every other model family in all 5 folds, and the bootstrap 95% CI of the validation difference excludes 0.
-- The engineered features (`03`) give no significant gain over the tuned Random Forest.
+- Gradient Boosting with Grid Search and a log-transformed target has the lowest CV and validation RMSE. It beats every model outside its family in all 5 folds, and the bootstrap 95% CI of the validation difference excludes 0.
+- Grid Search helped every tree model; for Gradient Boosting it lowered CV RMSE by 67, and training on `log(price)` lowered it by another 12.
+- The engineered features in `03` give no significant gain over the tuned Random Forest.
 - Linear Regression underfits (train and CV RMSE are almost equal and high). The unpruned Decision Tree overfits heavily (train 39 vs CV 560); pruning through Grid Search reduces the gap.
-- The Random Forest CV error still decreases with more training data, so the final model should be refit on all training rows.
-- The 10% most expensive listings produce 57% of the squared error of the best model; predictions are pulled toward the mean at both ends of the price range.
-- Gradient Boosting is currently evaluated with scikit-learn defaults; its tuned version will be added to the comparison.
+- The CV error of the tree ensembles still decreases with more training data, so the final model should be refit on all labeled rows.
+- The 10% most expensive listings produce 58% of the squared error of the best model; predictions are pulled toward the mean at both ends of the price range.
 
 ## Final Model
-Current recommendation: **Random Forest (tuned)** (`n_estimators=400`, `max_depth=20`, `min_samples_leaf=1`, `max_features=0.33`, original features), with CV RMSE 412.5 ± 24.1 and validation RMSE 444.9. The selection will be revisited once the tuned Gradient Boosting is added: lowest CV RMSE wins, and when the difference is not significant the simpler and faster model is preferred.
+Best of the required models: **Gradient Boosting, tuned, trained on log(price)** (`n_estimators=1000`, `learning_rate=0.1`, `max_depth=5`, `min_samples_leaf=5`, `subsample=0.8`, `max_features=0.5`), with CV RMSE 383.9 ± 14.1 and validation RMSE 405.9. It is the starting point for the final model selection, which adds location features and ensembles under the same rule: lowest CV RMSE wins, and when the difference is not significant the simpler and faster model is preferred.
 
 ## Reproducibility
 Requires Python 3.12 or newer (results in this README were produced with Python 3.14). Exact package versions are pinned in `requirements.txt`:
