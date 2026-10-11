@@ -18,7 +18,7 @@ This repository contains the work for our CAI 4105 Fall 2026 team project: predi
 ## Approach
 1. Data checks and shared preprocessing: one-hot encoding for `category`, `has_photo`, `state`; scaling of numeric features for Linear Regression only (`01`).
 2. One shared validation protocol for all models (below).
-3. The four required models, each tuned with Grid Search: Linear Regression (`01`), Decision Tree (`02`), Random Forest (`03`), Gradient Boosting (`04`). Gradient Boosting is also trained on a log-transformed target.
+3. We evaluated four required regression models: Linear Regression as a baseline (`01`), Decision Tree (`02`), Random Forest (`03`), and Gradient Boosting (`04`). Grid Search was used to tune the tree-based models. We also evaluated Gradient Boosting with a log-transformed target.
 4. Comparison of all models under one protocol with paired fold comparisons, bootstrap intervals, learning curves and error analysis (`05`).
 5. Improvement of the best models with neighborhood price features (price level of the nearest training listings, computed out-of-fold to avoid leakage), Grid Search for the new features, and averaging ensembles (`06`).
 6. Selection of the final model with a fixed rule, refit on all 7,398 labeled rows, predictions for the test set (`06`).
@@ -52,7 +52,7 @@ Pinned Python packages needed to run the notebooks.
 ## Validation Strategy
 - Hold-out split: 80% training (5,918 rows), 20% validation (1,480 rows), `train_test_split(test_size=0.2, random_state=42)`.
 - 5-fold cross-validation (`KFold(shuffle=True, random_state=42)`) on the training part for Grid Search and model selection. CV RMSE (mean ± std over folds) is the primary selection metric.
-- The validation set is not used for tuning and serves as an independent check.
+-  The validation set provides an additional performance check, while cross-validation RMSE remains the primary metric for model selection.
 - Preprocessing is inside scikit-learn pipelines, so it is fit on training folds only.
 - The test set is used only to generate the final predictions.
 
@@ -75,7 +75,7 @@ All models are retrained in `05_model_comparison.ipynb` with the hyperparameters
 Key findings:
 - Gradient Boosting with Grid Search and a log-transformed target has the lowest CV and validation RMSE. It beats every model outside its family in all 5 folds, and the bootstrap 95% CI of the validation difference excludes 0.
 - Grid Search helped every tree model; for Gradient Boosting it lowered CV RMSE by 67, and training on `log(price)` lowered it by another 12.
-- The engineered features in `03` give no significant gain over the tuned Random Forest.
+- The engineered features in notebook 03 did not improve the tuned Random Forest's CV or validation RMSE.
 - Linear Regression underfits (train and CV RMSE are almost equal and high). The unpruned Decision Tree overfits heavily (train 39 vs CV 560); pruning through Grid Search reduces the gap.
 - The CV error of the tree ensembles still decreases with more training data, so the final model should be refit on all labeled rows.
 - The 10% most expensive listings produce 58% of the squared error of the best model; predictions are pulled toward the mean at both ends of the price range.
@@ -95,7 +95,7 @@ Same split and CV folds as above. The tuned required models are the starting poi
 | Linear Regression | 520.9 ± 35.7 | 550.0 |
 
 - Neighborhood features lower the Random Forest CV RMSE by 24 and its validation RMSE by 34. Gradient Boosting already models location well, so on its own it does not improve with them.
-- Averaging Gradient Boosting with and without neighborhood features (the least correlated pair of models) lowers CV RMSE by 15 compared with the best single model, and the improvement is significant (paired t-test on the folds).
+- Averaging Gradient Boosting models with and without neighborhood features reduced CV RMSE by approximately 15 compared with the best single model. The paired fold comparison suggests a consistent improvement, although the statistical evidence is limited by the small number of cross-validation folds.
 
 ## Final Model
 **Equal-weight average of two Gradient Boosting models trained on `log(price)`:**
@@ -104,12 +104,18 @@ Same split and CV folds as above. The tuned required models are the starting poi
 
 **Final validation performance:** CV RMSE 368.8 ± 14.0, validation RMSE 401.5 (MAE 233.1, R² 0.78).
 
-**Selection rule:** walk up in complexity (best single model, best two-model ensemble, three-model ensemble) and move to the more complex model only if it is significantly better on the 5 CV folds. The two-model ensemble is significantly better than the best single model (t = 4.93); the three-model ensemble is only 0.4 lower on CV and not significantly better (t = 0.20), so the simpler two-model ensemble was selected. Trade-offs: low interpretability (feature importances only) and longer training than a single model (a few seconds), both acceptable for an RMSE competition.
+**Selection rule:** We compared models in order of increasing complexity: the best single model, the best two-model ensemble, and the three-model ensemble. We considered moving to a more complex model when paired CV fold comparisons suggested a meaningful improvement. The two-model ensemble showed an improvement over the best single model (paired t = 4.93). The three-model ensemble improved CV RMSE by only about 0.4 (paired t = 0.20), so we selected the simpler two-model ensemble.
+
+Although the three-model ensemble achieved a slightly lower validation RMSE (398.8 versus 401.5), the improvement in cross-validation RMSE was minimal (368.34 versus 368.77). We selected the two-model ensemble to balance predictive performance and model complexity.
+
+**Trade-offs:** The final ensemble has limited interpretability and requires more computation than a single model, but these trade-offs are acceptable for an RMSE-focused competition.
 
 For `predictions.csv` the final model is refit on all 7,398 labeled rows; the neighborhood features of the test listings are computed from those rows only.
-
 ## Reproducibility
-Requires Python 3.12 or newer (results in this README were produced with Python 3.14). Exact package versions are pinned in `requirements.txt`:
+
+The project results were produced using Python 3.14. The required Python packages are listed in `requirements.txt`.
+
+To set up the environment, run the following commands from the repository root:
 
 ```bash
 python -m venv .venv
@@ -118,7 +124,9 @@ pip install -r requirements.txt
 jupyter lab
 ```
 
-Notebooks are run from the `notebooks/` directory and read data from `../data/`. All random seeds are fixed (`random_state=42`), so rerunning `06_final_model.ipynb` (about 4 minutes) reproduces `predictions.csv` exactly.
+Open `notebooks/06_final_model.ipynb` and run all cells in order. The notebook loads the training and test datasets from the `data/` directory, performs preprocessing and model evaluation, trains the final ensemble, and generates `predictions.csv`.
+
+Random seeds are fixed where applicable (`random_state=42`) to support reproducibility. Exact reproduction should be verified by running the notebook in a clean environment.
 
 ## Workflow
 Each team member works on a separate Git branch. Changes are committed and pushed to the individual branch, then merged into the main branch through a pull request.
