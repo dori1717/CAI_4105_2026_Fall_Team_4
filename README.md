@@ -20,7 +20,7 @@ Contains the training and test datasets:
 Contains Jupyter notebooks for data preprocessing, model development, evaluation, and analysis:
 - 01_data_preprocessing.ipynb: data checks, shared train/validation split, preprocessing, Linear Regression
 - 02_decision_tree.ipynb: Decision Tree with Grid Search
-- 03_random_forest.ipynb: Random Forest with Grid Search and feature engineering (on branch `rimma-rf`, not merged yet)
+- 03_random_forest.ipynb: Random Forest with Grid Search and feature engineering
 - 05_model_comparison.ipynb: evaluation and comparison of all models under one protocol
 
 ### results/
