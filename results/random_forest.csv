@@ -1,0 +1,4 @@
+model,best_params,train_rmse,cv_rmse,cv_std,val_rmse
+Random Forest (baseline),{},159.97,424.34,22.32,456.55
+Random Forest (tuned),"{'max_depth': 20, 'max_features': 0.33, 'min_samples_leaf': 1, 'n_estimators': 400}",181.8,412.69,24.0,444.87
+Random Forest (tuned + FE),"{'max_depth': 20, 'max_features': 0.33, 'min_samples_leaf': 1, 'n_estimators': 400}",173.78,417.11,26.5,450.87
