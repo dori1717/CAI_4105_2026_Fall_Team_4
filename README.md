@@ -46,7 +46,7 @@ Contains Jupyter notebooks for data preprocessing, model development, evaluation
 
 ### results/
 - model_comparison.csv: all models with the same metrics (written by `05_model_comparison.ipynb`)
-- decision_tree.csv, linear_regression_results.csv, gradient_boosting.csv: per-model results from the model notebooks
+- decision_tree.csv, random_forest.csv, linear_regression_results.csv, gradient_boosting.csv: per-model results from the model notebooks
 
 ### predictions.csv
 Final predictions for `challenge1_test.csv` (written by `06_final_model.ipynb`).
