@@ -15,6 +15,11 @@ This repository contains the work for our CAI 4105 Fall 2026 team project: predi
 **Final notebook:** `notebooks/06_final_model.ipynb` (complete workflow from loading the data to `predictions.csv`).
 **Predictions:** `predictions.csv` (`ID`, `price` for all 2,467 test listings).
 
+## Workflow
+Team members work on separate Git branches. Changes are committed and pushed to the individual branch, then merged into the main branch through a pull request.
+
+Each team member developed their model in their own separate notebook. The work was then compiled into one final notebook, which took the best settings found in these notebooks to serve as the new baseline models, upon which further tuning and improvement was applied to arrive at the best model. Model performance and metrics were considered throughout.
+
 ## Approach
 1. Data checks and shared preprocessing: one-hot encoding for `category`, `has_photo`, `state`; scaling of numeric features for Linear Regression only (`01`).
 2. One shared validation protocol for all models (below).
@@ -127,6 +132,3 @@ jupyter lab
 Open `notebooks/06_final_model.ipynb` and run all cells in order. The notebook loads the training and test datasets from the `data/` directory, performs preprocessing and model evaluation, trains the final ensemble, and generates `predictions.csv`.
 
 Random seeds are fixed where applicable (`random_state=42`) to support reproducibility. Exact reproduction should be verified by running the notebook in a clean environment.
-
-## Workflow
-Each team member works on a separate Git branch. Changes are committed and pushed to the individual branch, then merged into the main branch through a pull request.
