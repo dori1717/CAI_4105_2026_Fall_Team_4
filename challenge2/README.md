@@ -40,9 +40,9 @@ only to generate final predictions.
 | Team member | Contribution |
 | --- | --- |
 | Dariya | Data checks, preprocessing, shared validation splits, and environment setup |
-| Bakai | Logistic Regression, Naïve Bayes, KNN, SVM, and the model comparison table |
+| Rimma | Logistic Regression, Naïve Bayes, KNN, SVM, and the model comparison table |
 | Niyaz | Decision Tree, Random Forest, Gradient Boosting, and GridSearchCV |
-| Rimma | Final notebook, confusion matrix, final model training, and `predictions.csv` |
+| Bakai | Final notebook, confusion matrix, final model training, and `predictions.csv` |
 
 ## Model Comparison and Final Results
 
