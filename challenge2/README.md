@@ -23,17 +23,41 @@ resulted in a purchase.
 4. Open `01_data_preprocessing.ipynb` in JupyterLab and run the cells
    from top to bottom.
 
-## Preprocessing and Validation
+## Approach
 
+### Preprocessing
 We use `Revenue` as the target and exclude `ID` from the predictors.
 The preprocessing pipeline standardizes numerical features and one-hot
 encodes categorical features. It is fitted on the training portion
-of each fold.
+of each fold (no leakage into validation data). Select models use 
+model-specific preprocessing rather than the shared preprocessing 
+(Bernoulli NB uses binned numeric features, and Gaussian NB uses 
+Yeo-Johnson transformed numeric features with `ExitRates` dropped).
 
+### Baselines, then tuning
+Required models are first evaluated with default or simple settings.
+We then use `GridSearchCV` to tune select models.
+
+### Validation
 We compare models using the same five stratified group folds. Sessions
 with identical feature values stay in the same fold. The primary metric
 is F1 for the positive class (`Revenue=True`). We use the test dataset
 only to generate final predictions.
+
+## Models Evaluated
+
+All seven required model families were evaluated with baseline settings and
+selectively tuned with Grid Search.
+
+| Model | Baseline setup | Grid Search tuned over |
+| --- | --- | --- |
+| Logistic Regression | Default, no class weights | Penalty (L1/L2), `C`, `class_weight` |
+| Naïve Bayes (Bernoulli, Gaussian) | Default settings, model-specific preprocessing | `alpha` / `var_smoothing`, class priors |
+| K-Nearest Neighbors | `K=5`, uniform voting, Euclidean | `K`, weighting, distance metric |
+| Support Vector Machine | Linear and RBF, `C=1`, balanced class weights | Kernel, `C`, `gamma`, `class_weight` |
+| Decision Tree | Defaults | N/A |
+| Random Forest | 300 trees | `n_estimators`, `max_depth`, `min_samples_leaf`, `class_weight` |
+| Gradient Boosting | Defaults | `n_estimators`, `learning_rate`, `max_depth`, `subsample` |
 
 ## Team Responsibilities
 
@@ -41,8 +65,8 @@ only to generate final predictions.
 | --- | --- |
 | Dariya | Data checks, preprocessing, shared validation splits, and environment setup |
 | Rimma | Logistic Regression, Naïve Bayes, KNN, SVM, and the model comparison table |
-| Niyaz | Decision Tree, Random Forest, Gradient Boosting, and GridSearchCV |
-| Bakai | Final notebook, confusion matrix, final model training, and `predictions.csv` |
+| Bakai | Decision Tree, Random Forest, Gradient Boosting, and GridSearchCV |
+| Niyaz | Final notebook, confusion matrix, final model training, and `predictions.csv` |
 
 ## Model Comparison and Final Results
 
