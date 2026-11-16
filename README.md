@@ -1,13 +1,25 @@
 # CAI 4105 - Fall 2026 - Team 4
 
-- **Final notebook:** [06_final_model.ipynb](notebooks/06_final_model.ipynb)
-- **Final predictions:** [predictions.csv](predictions.csv)
+This repository contains our team's work for both course challenges.
+
+| Challenge | Task | Final notebook | Predictions | Details |
+|---|---|---|---|---|
+| Challenge 1 | Apartment rent prediction (regression, RMSE) | [notebooks/06_final_model.ipynb](notebooks/06_final_model.ipynb) | [predictions.csv](predictions.csv) | this README, below |
+| Challenge 2 | Online purchase prediction (classification, F1 for `Revenue=True`) | [challenge2/04_final_model.ipynb](challenge2/04_final_model.ipynb) | [challenge2/predictions.csv](challenge2/predictions.csv) | [challenge2/README.md](challenge2/README.md) |
 
 ## Team Members
 - Dariya
 - Bakai
 - Rimma
 - Niyaz
+
+## Challenge 2: Online Purchase Prediction
+All Challenge 2 files are in the [challenge2/](challenge2/) folder: the notebooks, the data, `predictions.csv`, `requirements.txt`, and a separate [README](challenge2/README.md) with the approach, validation strategy, model comparison, final model, and instructions to reproduce the results.
+
+We predict whether an online shopping session ends with a purchase. All seven required classification models are compared on the same five stratified group folds. The final model is a tuned Random Forest with a validation F1 of 0.688 for `Revenue=True`.
+
+## Challenge 1: Apartment Rent Prediction
+The rest of this README describes Challenge 1.
 
 ## Project Overview
 This repository contains the work for our CAI 4105 Fall 2026 team project: predicting the monthly rental price of an apartment (`price`) from its characteristics and location. RMSE is the primary evaluation metric.
@@ -53,6 +65,9 @@ Final predictions for `challenge1_test.csv` (written by `06_final_model.ipynb`).
 
 ### requirements.txt
 Pinned Python packages needed to run the notebooks.
+
+### challenge2/
+All Challenge 2 work (notebooks, data, predictions, requirements). See [challenge2/README.md](challenge2/README.md).
 
 ## Validation Strategy
 - Hold-out split: 80% training (5,918 rows), 20% validation (1,480 rows), `train_test_split(test_size=0.2, random_state=42)`.
